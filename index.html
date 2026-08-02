@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Brave Sports — спортивные товары для единоборств оптом. Каталог для оптовых покупателей.">
+  <title>Brave Sports — спортивные товары оптом</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#top" aria-label="Brave Sports">
+        <span class="brand-mark">BS</span>
+        <span><strong>BRAVE SPORTS</strong><small>ОПТОВЫЙ КАТАЛОГ</small></span>
+      </a>
+      <nav class="desktop-nav" aria-label="Навигация">
+        <a href="#catalog">Каталог</a>
+        <a href="#advantages">Условия</a>
+        <a href="#contacts">Контакты</a>
+      </nav>
+      <button class="order-button" id="openOrder" type="button">
+        Заявка <span id="orderCount">0</span>
+      </button>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">ОПТОВЫЕ ПОСТАВКИ ПО РОССИИ</p>
+          <h1>Экипировка для бокса и единоборств</h1>
+          <p class="hero-lead">Перчатки, защита, экипировка и тренировочные снаряды для спортивных магазинов, клубов и секций.</p>
+          <div class="hero-actions">
+            <a class="primary-button" href="#catalog">Открыть каталог</a>
+            <a class="secondary-button" href="tel:+79031086577">8 (903) 108-65-77</a>
+          </div>
+          <div class="hero-meta">
+            <span>Москва</span><span>Оптовые поставки</span><span>Фото товаров для партнёров</span>
+          </div>
+        </div>
+        <div class="hero-panel" aria-hidden="true">
+          <div class="hero-panel-label">BRAVE</div>
+          <div class="hero-product-shape shape-one"></div>
+          <div class="hero-product-shape shape-two"></div>
+          <div class="hero-product-shape shape-three"></div>
+          <p>SPORTS<br>WHOLESALE</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="advantages" id="advantages">
+      <div class="container advantage-grid">
+        <article><strong>Большой ассортимент</strong><span>Товары для бокса, ММА, борьбы и других единоборств</span></article>
+        <article><strong>Материалы для продаж</strong><span>Ссылки на папки с фотографиями доступны в карточках</span></article>
+        <article><strong>Актуальный каталог</strong><span>Данные загружаются из рабочего прайса Google Sheets</span></article>
+        <article><strong>Персональная заявка</strong><span>Соберите список товаров и отправьте менеджеру</span></article>
+      </div>
+    </section>
+
+    <section class="catalog-section" id="catalog">
+      <div class="container">
+        <div class="section-heading">
+          <div><p class="eyebrow dark">КАТАЛОГ BRAVE SPORTS</p><h2>Товары для оптовых покупателей</h2></div>
+          <div class="catalog-status" id="catalogStatus">Загрузка прайса…</div>
+        </div>
+
+        <div class="catalog-toolbar">
+          <label class="search-field">
+            <span class="sr-only">Поиск</span>
+            <input id="searchInput" type="search" placeholder="Поиск по названию, артикулу, бренду…" autocomplete="off">
+          </label>
+          <select id="categoryFilter" aria-label="Категория"><option value="">Все категории</option></select>
+          <select id="brandFilter" aria-label="Бренд"><option value="">Все бренды</option></select>
+          <select id="sortSelect" aria-label="Сортировка">
+            <option value="default">По порядку прайса</option>
+            <option value="name-asc">Название: А—Я</option>
+            <option value="code-asc">Код: по возрастанию</option>
+          </select>
+          <button class="clear-button" id="clearFilters" type="button">Сбросить</button>
+        </div>
+
+        <div class="active-summary"><span id="resultCount">0 товаров</span></div>
+        <div class="product-grid" id="productGrid" aria-live="polite"></div>
+        <div class="empty-state" id="emptyState" hidden>
+          <h3>Товары не найдены</h3><p>Измените поисковый запрос или сбросьте фильтры.</p>
+        </div>
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </section>
+
+    <section class="wholesale-cta">
+      <div class="container cta-inner">
+        <div><p class="eyebrow">ОПТОВЫЙ ЗАКАЗ</p><h2>Подберите товары и направьте заявку менеджеру</h2></div>
+        <button class="primary-button light" id="openOrderBottom" type="button">Открыть заявку</button>
+      </div>
+    </section>
+  </main>
+
+  <footer id="contacts">
+    <div class="container footer-grid">
+      <div class="brand footer-brand"><span class="brand-mark">BS</span><span><strong>BRAVE SPORTS</strong><small>СПОРТИВНЫЕ ТОВАРЫ ОПТОМ</small></span></div>
+      <div><h3>Контактное лицо</h3><p>Асрар Ахмад</p><p>г. Москва</p></div>
+      <div><h3>Связаться</h3><a href="tel:+79031086577">8 (903) 108-65-77</a><a href="mailto:info@worldsport21.ru">info@worldsport21.ru</a></div>
+      <div><h3>Для покупателей</h3><a href="#catalog">Каталог</a><button class="footer-link" id="openOrderFooter" type="button">Оптовая заявка</button></div>
+    </div>
+    <div class="container footer-bottom"><span>© <span id="year"></span> Brave Sports</span><span>Информация на сайте не является публичной офертой</span></div>
+  </footer>
+
+  <dialog class="order-dialog" id="orderDialog">
+    <div class="dialog-header"><div><p class="eyebrow dark">ОПТОВАЯ ЗАЯВКА</p><h2>Выбранные товары</h2></div><button class="icon-button" id="closeOrder" type="button" aria-label="Закрыть">×</button></div>
+    <div class="dialog-body">
+      <div id="orderItems" class="order-items"></div>
+      <div id="orderEmpty" class="order-empty">Добавьте товары из каталога.</div>
+      <div class="customer-fields">
+        <label>Компания / ИП<input id="customerCompany" type="text" placeholder="Название компании"></label>
+        <label>Имя<input id="customerName" type="text" placeholder="Контактное лицо"></label>
+        <label>Телефон<input id="customerPhone" type="tel" placeholder="+7 …"></label>
+        <label>E-mail<input id="customerEmail" type="email" placeholder="name@example.ru"></label>
+        <label class="full">Комментарий<textarea id="customerComment" rows="3" placeholder="Город, способ доставки, дополнительные пожелания"></textarea></label>
+      </div>
+    </div>
+    <div class="dialog-actions">
+      <button class="clear-button" id="clearOrder" type="button">Очистить</button>
+      <button class="secondary-button dark" id="downloadOrder" type="button">Скачать CSV</button>
+      <button class="primary-button" id="emailOrder" type="button">Отправить по e-mail</button>
+    </div>
+  </dialog>
+
+  <template id="productTemplate">
+    <article class="product-card">
+      <div class="product-visual"><span class="product-category-label"></span><div class="product-placeholder"><strong>BRAVE</strong><small>SPORTS</small></div></div>
+      <div class="product-content">
+        <div class="product-code"></div><h3 class="product-title"></h3>
+        <dl class="product-attributes"></dl>
+        <div class="product-actions">
+          <a class="photo-link" target="_blank" rel="noopener">Фото товара</a>
+          <button class="add-button" type="button">В заявку</button>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <script src="assets/config.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
