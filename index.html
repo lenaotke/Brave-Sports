@@ -1028,7 +1028,7 @@
         <div class="hero-stat"><b>свыше 1250</b><span>Позиций в каталоге</span></div>
         <div class="hero-stat"><b>19</b><span>Брендов</span></div>
         <div class="hero-stat"><b>11</b><span>Категорий товара</span></div>
-        <div class="hero-stat"><b>30 тыс. руб.</b><span>Минимальный заказ</span></div>
+        <div class="hero-stat"><b>50 тыс. руб.</b><span>Минимальный заказ</span></div>
       </div>
     </div>
   </div>
@@ -1074,7 +1074,7 @@
       </div>
       <div class="adv-card" data-reveal style="--i:2">
         <h3>Понятный минимум</h3>
-        <p>Порог входа в опт: 30 тыс. руб. Дальше добираете каталог под свой ассортимент.</p>
+        <p>Порог входа в опт: 50 тыс. руб. Дальше добираете каталог под свой ассортимент.</p>
       </div>
       <div class="adv-card" data-reveal style="--i:3">
         <h3>Доставка по стране</h3>
@@ -1209,15 +1209,15 @@
         <div class="terms-list">
           <div class="term-item">
             <svg class="icon"><use href="#ic-tag"/></svg>
-            <div><h4>Минимальный заказ: 30 тыс. руб</h4><p>Порог действует на сумму заказа по прайсу, набор товаров любой.</p></div>
+            <div><h4>Минимальный заказ: 50 тыс. руб</h4><p>Порог действует на сумму заказа по прайсу, набор товаров любой.</p></div>
           </div>
           <div class="term-item">
             <svg class="icon"><use href="#ic-truck"/></svg>
-            <div><h4>Бесплатно по Москве</h4><p>Бесплатная доставка в пределах МКАД от минимальной суммы заказа 30 тыс. руб.</p></div>
+            <div><h4>Бесплатно по Москве</h4><p>Бесплатная доставка в пределах МКАД от минимальной суммы заказа 50 тыс. руб.</p></div>
           </div>
           <div class="term-item">
             <svg class="icon"><use href="#ic-box"/></svg>
-            <div><h4>Отправка по России</h4><p>Транспортными компаниями в любой регион при заказе от 30 тыс. руб. Стоимость доставки оплачивает покупатель.</p></div>
+            <div><h4>Отправка по России</h4><p>Транспортными компаниями в любой регион при заказе от 50 тыс. руб. Стоимость доставки оплачивает покупатель.</p></div>
           </div>
           <div class="term-item">
             <svg class="icon"><use href="#ic-check"/></svg>
@@ -1227,7 +1227,7 @@
       </div>
       <div class="terms-card" data-reveal>
         <div class="h-card">Кратко</div>
-        <div class="terms-card-row"><span>Мин. сумма заказа</span><span>30 тыс. руб</span></div>
+        <div class="terms-card-row"><span>Мин. сумма заказа</span><span>50 тыс. руб</span></div>
         <div class="terms-card-row"><span>Доставка, Москва / МКАД</span><span>Бесплатно</span></div>
         <div class="terms-card-row"><span>Доставка, регионы РФ</span><span>ТК, за счёт покупателя</span></div>
         <div class="terms-card-row"><span>Форма оплаты</span><span>По согласованию</span></div>
@@ -2333,7 +2333,7 @@ const PRODUCTS = [{"i":1,"c":"1120","n":"Боксерские  бинты эла
 /* Уведомления в Telegram отправляет сервер (Apps Script, doPost), токен бота на сайте больше не хранится. */
 const MS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxs3HXWR0neKA-yuWbh366fnFdZEiMpXKsA5O-54SjxfW-pJ8_3KQbk3SChSy1gyx5gog/exec';
 const MS_SECRET = '211814Llt';
-const MIN_ORDER = 30000;
+const MIN_ORDER = 50000;
 
 const CAT_ORDER = [
   ['Перчатки','ic-glove'],
@@ -3249,7 +3249,7 @@ function renderCartDrawer(){
   const checkoutBtn = byId('checkoutBtn');
   checkoutBtn.removeAttribute('disabled');
   if(total < MIN_ORDER){
-    notice.textContent = `Рекомендуемая минимальная сумма заказа — ${fmt(MIN_ORDER)} ₽. Не хватает ${fmt(MIN_ORDER-total)} ₽, но заявку можно отправить и на меньшую сумму`;
+    notice.textContent = `Рекомендуемая минимальная сумма заказа — ${fmt(MIN_ORDER)} ₽. Не хватает ${fmt(MIN_ORDER-total)} ₽`;
     notice.classList.remove('ok');
   } else {
     notice.textContent = 'Минимальная сумма заказа набрана';
