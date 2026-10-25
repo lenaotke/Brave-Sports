@@ -449,9 +449,9 @@
   }
   .pcard-brand{
     position:absolute;bottom:0;right:0;
-    font-family:var(--font-m);font-size:.68rem;font-weight:700;color:var(--white);
-    text-transform:uppercase;letter-spacing:.02em;
-    background:var(--accent);padding:.35rem .6rem;z-index:2;
+    font-family:var(--font-b);font-size:.74rem;font-weight:800;color:var(--white);line-height:1.2;
+    text-transform:uppercase;letter-spacing:.05em;
+    background:var(--accent);padding:.4rem .7rem;z-index:2;
     max-width:calc(100% - .8rem);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
   }
   .pcard-body{padding:1.1rem 1.2rem 1.3rem;display:flex;flex-direction:column;gap:.6rem;flex:1}
@@ -556,6 +556,13 @@
   .footer-col a:hover{color:var(--white)}
   .footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:var(--gap-m);flex-wrap:wrap;gap:1rem}
   .footer-bottom span{font-size:.75rem;color:var(--muted-2)}
+  /* Ненавязчивая подпись разработчика сайта внизу страницы */
+  .dev-credit{display:flex;align-items:center;justify-content:center;gap:.55rem;padding:1.1rem 0 .2rem;opacity:.55;transition:opacity .25s}
+  .dev-credit:hover{opacity:1}
+  .dev-credit span{font-size:.68rem;color:var(--muted-2);letter-spacing:.02em}
+  .dev-credit a{display:flex;width:1.05rem;height:1.05rem;filter:grayscale(1);transition:filter .25s,transform .25s}
+  .dev-credit a:hover{filter:none;transform:translateY(-1px)}
+  .dev-credit svg{width:100%;height:100%;display:block}
   .footer-social{display:flex;gap:.8rem}
 
   /* cart drawer */
@@ -2248,6 +2255,12 @@
     <div class="footer-bottom">
       <span>© 2026 Brave Sports · ИП Асрар Ахмад</span>
       <span>Все цены на сайте: оптовые, включают НДС</span>
+    </div>
+    <div class="dev-credit">
+      <span>Создание сайтов — напишите:</span>
+      <a href="https://wa.me/79096307659" target="_blank" rel="noopener noreferrer" aria-label="Написать разработчику сайта в WhatsApp" title="WhatsApp"><svg><use href="#ic-wa-badge"/></svg></a>
+      <a href="https://t.me/+79096307659" target="_blank" rel="noopener noreferrer" aria-label="Написать разработчику сайта в Telegram" title="Telegram"><svg><use href="#ic-tg-badge"/></svg></a>
+      <a href="https://max.ru/u/f9LHodD0cOLvrOgrEcCmJ63SfIetk60pXwgD52jJsmACb5Ep9MD-5bpp8-8" target="_blank" rel="noopener noreferrer" aria-label="Написать разработчику сайта в MAX" title="MAX"><svg><use href="#ic-max-badge"/></svg></a>
     </div>
   </div>
 </footer>
