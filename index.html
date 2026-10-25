@@ -285,6 +285,26 @@
   .adv-section .eyebrow::before{background:#111}
   .adv-section .h-section{color:#fff}
   .catalog-head-band{background:var(--accent);padding:2.4rem 0;margin-bottom:var(--gap-l)}
+  /* Заголовок "Новинки на складе" — ссылка на отдельный каталог новинок */
+  .novinki-title-link{color:inherit;text-decoration:none;position:relative;display:inline-block;cursor:pointer}
+  .novinki-title-link::after{content:'';position:absolute;left:0;right:0;bottom:-.12em;height:3px;background:#fff;transform:scaleX(0);transform-origin:left;transition:transform .35s var(--ease)}
+  .novinki-title-link:hover::after,.novinki-title-link:focus-visible::after{transform:scaleX(1)}
+  .novinki-title-link:focus-visible{outline:none}
+  @media (hover:none){.novinki-title-link::after{transform:scaleX(1);opacity:.35}}
+  /* Режим "Каталог новинок": остаются шапка, каталог и подвал */
+  .back-to-catalog{display:none;margin-top:1.4rem;border-color:#fff;color:#fff}
+  .back-to-catalog:hover{background:#fff;color:var(--accent)}
+  body.novinki-mode .back-to-catalog{display:inline-flex}
+  body.novinki-mode .hero,
+  body.novinki-mode .ticker-section,
+  body.novinki-mode .about,
+  body.novinki-mode .adv-section,
+  body.novinki-mode .cat3d-section,
+  body.novinki-mode .novinki-section,
+  body.novinki-mode .terms,
+  body.novinki-mode .b2b{display:none !important}
+  body.novinki-mode .catalog{padding-top:var(--header-h, 5.5rem) !important}
+  body.novinki-mode #filtersPanel .cnt{display:none}
   .catalog-head-band .eyebrow{color:#fff}
   .catalog-head-band .eyebrow::before{background:#fff}
   .catalog-head-band .h-section{color:#fff}
@@ -1117,7 +1137,7 @@
   <div class="wrap">
     <div class="section-head" data-reveal>
       <div>
-        <h2 class="h-section">Новинки на складе</h2>
+        <h2 class="h-section"><a href="?novinki" class="novinki-title-link" id="novinkiTitleLink" title="Открыть каталог новинок">Новинки на складе</a></h2>
       </div>
     </div>
   </div>
@@ -1139,9 +1159,10 @@
     <div class="wrap">
       <div class="section-head" data-reveal>
         <div>
-          <div class="eyebrow">Каталог</div>
-          <h2 class="h-section">Весь ассортимент</h2>
-          <p>Фильтруйте по категориям, брендам и цене. Добавляйте в корзину, сумма считается автоматически.</p>
+          <div class="eyebrow" id="catalogEyebrow">Каталог</div>
+          <h2 class="h-section" id="catalogTitle">Весь ассортимент</h2>
+          <p id="catalogLead">Фильтруйте по категориям, брендам и цене. Добавляйте в корзину, сумма считается автоматически.</p>
+          <a href="./" class="btn btn-ghost btn-sm back-to-catalog" id="backToCatalogBtn">← Весь каталог</a>
         </div>
       </div>
     </div>
@@ -2880,6 +2901,14 @@ function syncCategoryCheckboxes(){
 /* ===== FILTER / SORT / RENDER GRID ===== */
 function getFiltered(){
   let arr = MODEL_PRODUCTS;
+  if(state.novinki){
+    const nov = new Set(NOVINKI_CODES.map(String));
+    arr = arr.filter(g => {
+      const v = g.variants.find(x => nov.has(String(x.c)));
+      if(v && !selectedVariants[g.gid]) selectedVariants[g.gid] = v.i;
+      return !!v;
+    });
+  }
   if(state.cats.size || state.subs.size) arr = arr.filter(p => state.cats.has(p.cat) || state.subs.has(p.cat + '␟' + p.sub));
   if(state.brands.size) arr = arr.filter(p => state.brands.has(p.br));
   if(state.priceMin != null) arr = arr.filter(p => p.p >= state.priceMin);
@@ -3402,6 +3431,43 @@ function initAboutVideoAutoplay(){
 }
 
 /* ===== INIT / EVENTS ===== */
+/* ===== КАТАЛОГ НОВИНОК (адрес ...?novinki) ===== */
+function setNovinkiMode(on){
+  state.novinki = !!on; state.page = 1;
+  document.body.classList.toggle('novinki-mode', state.novinki);
+  byId('catalogEyebrow').textContent = state.novinki ? 'Каталог' : 'Каталог';
+  byId('catalogTitle').textContent = state.novinki ? 'Новинки на складе' : 'Весь ассортимент';
+  byId('catalogLead').textContent = state.novinki
+    ? 'Все новые поступления на склад. Добавляйте в корзину и оформляйте заказ, как в основном каталоге.'
+    : 'Фильтруйте по категориям, брендам и цене. Добавляйте в корзину, сумма считается автоматически.';
+  document.title = state.novinki ? 'Новинки на складе — Brave Sports' : DEFAULT_TITLE;
+  renderGrid();
+}
+const DEFAULT_TITLE = document.title;
+function isNovinkiUrl(){ return new URLSearchParams(location.search).has('novinki'); }
+function openNovinki(){
+  history.pushState({novinki:true}, '', location.pathname + '?novinki');
+  setNovinkiMode(true);
+  window.scrollTo(0, 0);
+}
+function closeNovinki(scrollToCatalog){
+  history.pushState({}, '', location.pathname);
+  setNovinkiMode(false);
+  if(scrollToCatalog){ const c = byId('catalog'); if(c) c.scrollIntoView(); }
+}
+function initNovinkiPage(){
+  const link = byId('novinkiTitleLink');
+  if(link) link.addEventListener('click', e => { e.preventDefault(); openNovinki(); });
+  byId('backToCatalogBtn').addEventListener('click', e => { e.preventDefault(); closeNovinki(true); });
+  window.addEventListener('popstate', () => { setNovinkiMode(isNovinkiUrl()); window.scrollTo(0, 0); });
+  // ссылки меню (#about, #terms, #contacts...) в режиме новинок сначала возвращают обычную страницу
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[href^="#"]');
+    if(a && state.novinki){ history.replaceState({}, '', location.pathname); setNovinkiMode(false); }
+  }, true);
+  if(isNovinkiUrl()) setNovinkiMode(true);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   loadCart();
   initProductDetail();
@@ -3410,6 +3476,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderFilters();
   renderGrid();
   renderNovinki();
+  initNovinkiPage();
   updateCartUI();
   observeReveals();
   initAboutVideoAutoplay();
