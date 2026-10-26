@@ -304,7 +304,6 @@
   body.novinki-mode .terms,
   body.novinki-mode .b2b{display:none !important}
   body.novinki-mode .catalog{padding-top:var(--header-h, 5.5rem) !important}
-  body.novinki-mode #filtersPanel .cnt{display:none}
   .catalog-head-band .eyebrow{color:#fff}
   .catalog-head-band .eyebrow::before{background:#fff}
   .catalog-head-band .h-section{color:#fff}
@@ -700,10 +699,9 @@
     /* Новинки на мобильных — нативная прокрутка пальцем вместо CSS-анимации.
        Работает гарантированно в любом браузере, плюс кнопки-стрелки ниже
        для тех, кто предпочитает нажимать, а не листать. */
-    .novinki-stage{overflow-x:auto;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+    .novinki-stage{overflow-x:auto;scroll-snap-type:none;-webkit-overflow-scrolling:touch;scrollbar-width:none}
     .novinki-stage::-webkit-scrollbar{display:none}
     .novinki-track{animation:none !important;gap:.8rem}
-    .novinki-card{scroll-snap-align:start}
     .novinki-nav-mobile{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem}
     /* Заголовок ложится прямо на фото, слева сверху — как на компьютере.
        Остальной текст (описание/кнопки/цифры) идёт сразу после фото
@@ -2469,10 +2467,30 @@ function novinkiCardHTML(p){
     </div>
   </div>`;
 }
+/* Порядок новинок: сначала заведённые последними. NOVINKI_CODES идут в
+   порядке строк таблицы "Каталог", новые строки добавляются вниз, поэтому
+   чем ниже строка — тем свежее товар. Варианты одной модели (размеры/цвета)
+   держатся вместе и в своём обычном порядке. */
+function novinkiRank(){
+  const pos = {}; NOVINKI_CODES.forEach((c, i) => { pos[String(c)] = i; });
+  const groupMax = {};
+  PRODUCTS.forEach(p => {
+    const i = pos[String(p.c)]; if(i === undefined) return;
+    const g = String(p.mg || p.c);
+    groupMax[g] = Math.max(groupMax[g] ?? -1, i);
+  });
+  return { pos, groupMax };
+}
+function novinkiFreshFirst(a, b){
+  const r = novinkiFreshFirst.r || (novinkiFreshFirst.r = novinkiRank());
+  const ga = r.groupMax[String(a.mg || a.c)] ?? -1, gb = r.groupMax[String(b.mg || b.c)] ?? -1;
+  if(ga !== gb) return gb - ga;
+  return (r.pos[String(a.c)] ?? 0) - (r.pos[String(b.c)] ?? 0);
+}
 function renderNovinki(){
   const track = byId('novinkiTrack');
   if(!track) return;
-  const items = NOVINKI_CODES.map(c => PRODUCTS.find(p => p.c === c)).filter(Boolean);
+  const items = NOVINKI_CODES.map(c => PRODUCTS.find(p => p.c === c)).filter(Boolean).sort(novinkiFreshFirst);
   if(!items.length) return;
   track.innerHTML = [...items, ...items].map(novinkiCardHTML).join('');
   track.querySelectorAll('.novinki-card').forEach(card => {
@@ -2926,6 +2944,11 @@ function getFiltered(){
     });
   }
   arr = arr.slice();
+  if(state.novinki && state.sort === 'default'){
+    const r = novinkiRank();
+    const rank = g => Math.max(-1, ...g.variants.map(v => r.groupMax[String(v.mg || v.c)] ?? -1));
+    arr.sort((a, b) => rank(b) - rank(a));
+  }
   if(state.sort === 'price-asc') arr.sort((a,b)=>a.p-b.p);
   else if(state.sort === 'price-desc') arr.sort((a,b)=>b.p-a.p);
   else if(state.sort === 'name-asc') arr.sort((a,b)=>a.n.localeCompare(b.n,'ru'));
@@ -3455,7 +3478,55 @@ function closeNovinki(scrollToCatalog){
   setNovinkiMode(false);
   if(scrollToCatalog){ const c = byId('catalog'); if(c) c.scrollIntoView(); }
 }
+/* Карусель новинок на телефоне: сама плавно едет, как на компьютере.
+   Пальцем можно листать — после касания пауза 4 секунды, потом едет дальше.
+   Список в карусели продублирован, поэтому на середине тихо возвращаемся
+   к началу — лента бесконечная. */
+function initNovinkiAutoScroll(){
+  const stage = byId('novinkiStage');
+  const track = byId('novinkiTrack');
+  if(!stage || !track) return;
+  const mq = window.matchMedia('(max-width:760px)');
+  let pausedUntil = 0, pos = null, lastT = 0;
+  const pause = ms => { pausedUntil = Date.now() + (ms || 4000); pos = null; };
+  ['touchstart','pointerdown','wheel'].forEach(ev => stage.addEventListener(ev, () => pause(), { passive:true }));
+  byId('novinkiPrevBtn')?.addEventListener('click', () => pause(5000));
+  byId('novinkiNextBtn')?.addEventListener('click', () => pause(5000));
+  const tick = t => {
+    const dt = lastT ? Math.min((t - lastT) / 1000, 0.1) : 0;
+    lastT = t;
+    if(mq.matches && !document.hidden && Date.now() > pausedUntil && track.scrollWidth > stage.clientWidth){
+      const half = track.scrollWidth / 2;
+      const speed = half / 46; // как на компьютере: полный круг за 46 секунд
+      if(pos === null) pos = stage.scrollLeft;
+      pos += speed * dt;
+      if(pos >= half) pos -= half;
+      stage.scrollLeft = Math.round(pos);
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
+/* На странице новинок любое действие с фильтрами, поиском, ценой или
+   сортировкой переводит в основной каталог с этим же фильтром —
+   чтобы покупатель не упирался в "0 товаров" среди новинок. */
+function leaveNovinkiForFilters(){
+  if(!state.novinki) return;
+  history.pushState({}, '', location.pathname);
+  setNovinkiMode(false);
+  setTimeout(() => { const c = byId('catalog'); if(c) c.scrollIntoView(); }, 0);
+}
 function initNovinkiPage(){
+  document.addEventListener('change', e => {
+    if(state.novinki && e.target.closest('#filtersPanel, #sortSelect')) leaveNovinkiForFilters();
+  }, true);
+  document.addEventListener('input', e => {
+    if(state.novinki && e.target.closest('#filtersPanel, #searchInput')) leaveNovinkiForFilters();
+  }, true);
+  document.addEventListener('click', e => {
+    if(state.novinki && e.target.closest('#resetFiltersBtn')) leaveNovinkiForFilters();
+  }, true);
   const link = byId('novinkiTitleLink');
   if(link) link.addEventListener('click', e => { e.preventDefault(); openNovinki(); });
   byId('backToCatalogBtn').addEventListener('click', e => { e.preventDefault(); closeNovinki(true); });
@@ -3477,6 +3548,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderGrid();
   renderNovinki();
   initNovinkiPage();
+  initNovinkiAutoScroll();
   updateCartUI();
   observeReveals();
   initAboutVideoAutoplay();
